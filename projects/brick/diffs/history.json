@@ -1,0 +1,56 @@
+[
+  {
+    "iteration": 1,
+    "overall_match": 82.9,
+    "bg_match": null,
+    "heatmap": "diffs/v1_diff_heatmap.png",
+    "overlay": "diffs/v1_diff_overlay.png",
+    "regions": {
+      "top-left": 56.8,
+      "top-center": 53.8,
+      "top-right": 56.3,
+      "mid-left": 92.7,
+      "mid-center": 94.6,
+      "mid-right": 97.1,
+      "bot-left": 99.1,
+      "bot-center": 96.8,
+      "bot-right": 99.3
+    }
+  },
+  {
+    "iteration": 2,
+    "overall_match": 81.3,
+    "bg_match": null,
+    "heatmap": "diffs/v2_diff_heatmap.png",
+    "overlay": "diffs/v2_diff_overlay.png",
+    "regions": {
+      "top-left": 51.7,
+      "top-center": 52.8,
+      "top-right": 57.0,
+      "mid-left": 89.5,
+      "mid-center": 93.0,
+      "mid-right": 96.1,
+      "bot-left": 98.3,
+      "bot-center": 94.3,
+      "bot-right": 98.8
+    }
+  },
+  {
+    "iteration": 3,
+    "overall_match": 96.7,
+    "bg_match": null,
+    "heatmap": "diffs/v3_diff_heatmap.png",
+    "overlay": "diffs/v3_diff_overlay.png",
+    "regions": {
+      "top-left": 93.5,
+      "top-center": 98.0,
+      "top-right": 98.9,
+      "mid-left": 92.7,
+      "mid-center": 94.6,
+      "mid-right": 97.1,
+      "bot-left": 99.1,
+      "bot-center": 96.8,
+      "bot-right": 99.3
+    }
+  }
+]
