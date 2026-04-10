@@ -9,21 +9,21 @@ function Step({ number, badge, title, description }: StepProps) {
   return (
     <div className="flex flex-col gap-[23px]">
       {/* Number */}
-      <span className="font-[Pretendard] font-extrabold text-[64px] leading-[0.8em] tracking-[-0.005em] text-[#757575]">
+      <span className="font-[Pretendard] font-extrabold text-[64px] leading-[51px] tracking-[-0.005em] text-[#757575] whitespace-nowrap">
         {number}
       </span>
       {/* Badge */}
       <div className="w-[50px] h-[50px] bg-[#F5F5F5] rounded-[12.3638334274292px] flex flex-col justify-center items-center" style={{ padding: '15px 19px 16px' }}>
-        <span className="font-[Pretendard] font-extrabold text-[24px] leading-[0.8em] tracking-[-0.005em] text-[#757575]">
+        <span className="font-[Pretendard] font-extrabold text-[24px] leading-[19px] tracking-[-0.005em] text-[#757575] whitespace-nowrap">
           {badge}
         </span>
       </div>
       {/* Content */}
       <div className="flex flex-col gap-[25px]">
-        <span className="font-[Pretendard] font-extrabold text-[32px] leading-[0.8em] tracking-[-0.005em] text-[#575757]">
+        <span className="font-[Pretendard] font-extrabold text-[32px] leading-[26px] tracking-[-0.005em] text-[#575757] whitespace-nowrap">
           {title}
         </span>
-        <span className="font-[Pretendard] font-semibold text-[16px] leading-[0.75em] tracking-[-0.005em] text-[#949494] whitespace-pre-line">
+        <span className="font-[Pretendard] font-semibold text-[16px] leading-[22px] tracking-[-0.005em] text-[#949494] whitespace-pre-line">
           {description}
         </span>
       </div>
@@ -34,20 +34,22 @@ function Step({ number, badge, title, description }: StepProps) {
 export default function Process() {
   return (
     <section className="relative w-[1259px] h-[977px]">
-      {/* Background */}
       <div className="absolute inset-0 w-[1259px] h-[977px] bg-[#FFFFFF] rounded-[20px]" />
 
-      {/* Title */}
-      <h2 className="absolute left-[64px] top-[148px] w-[400px] h-[118px] font-[Pretendard] font-extrabold text-[64px] leading-[0.8em] tracking-[-0.005em] text-[#000000] whitespace-pre-line">
+      {/* Title - bbox 400x118, 2 lines of 64px → leading 59px */}
+      <h2 className="absolute left-[64px] top-[148px] w-[400px] h-[118px] font-[Pretendard] font-extrabold text-[64px] leading-[59px] tracking-[-0.005em] text-[#000000] whitespace-pre-line">
         {"우리가 탁월함을\n조립하는 방법."}
       </h2>
 
-      {/* Subtitle */}
-      <p className="absolute left-[64px] top-[296px] w-[598px] h-[54px] font-[Pretendard] font-medium text-[24px] leading-[0.8em] tracking-[-0.005em] text-[#666666] whitespace-pre-line">
+      {/* Subtitle - bbox 598x54, 2 lines of 24px → leading 27px */}
+      <p className="absolute left-[64px] top-[296px] w-[598px] h-[54px] font-[Pretendard] font-medium text-[24px] leading-[27px] tracking-[-0.005em] text-[#666666] whitespace-pre-line">
         {"우리의 프로세스는 건축학적 정밀함에서 영감을 받았습니다. \n견고하고 확장 가능하며 유지보수가 쉬운 소프트웨어를 만듭니다."}
       </p>
 
-      {/* Steps */}
+      {/* Horizontal Line - behind steps */}
+      <div className="absolute left-[72px] top-[607px] w-[1114px] h-0 border-t-[2px] border-[#A3A3A3]" />
+
+      {/* Steps - on top of line */}
       <div className="absolute left-[64px] top-[497px]">
         <Step
           number="01"
@@ -80,9 +82,6 @@ export default function Process() {
           description={"모든 모듈은 최종 조립 및 인프라\n배포 전에 철저히 테스트되고 검증됩니다."}
         />
       </div>
-
-      {/* Horizontal Line */}
-      <div className="absolute left-[72px] top-[607px] w-[1114px] h-0 border-t-[2px] border-[#A3A3A3]" />
     </section>
   );
 }

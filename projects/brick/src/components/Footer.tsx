@@ -1,7 +1,6 @@
 export default function Footer() {
   return (
     <section className="relative w-[1259px] h-[597px]">
-      {/* Background */}
       <div className="absolute inset-0 w-[1259px] h-[597px] bg-[#FFFFFF] rounded-[20px]" />
 
       {/* Footer content */}
@@ -9,7 +8,7 @@ export default function Footer() {
         {/* Divider */}
         <div className="w-full h-0 border-t border-[#DEDEDE]" />
         {/* Bottom row */}
-        <div className="flex flex-row justify-between items-center w-full">
+        <div className="flex flex-row justify-between items-center w-full whitespace-nowrap">
           <span className="font-[Pretendard] font-medium text-[16px] leading-[1em] tracking-[-0.005em] text-[#666666] w-[379px]">
             © 2026 BRICK Technologies Inc. All rights reserved.
           </span>

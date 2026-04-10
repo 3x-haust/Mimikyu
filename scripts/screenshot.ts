@@ -21,8 +21,9 @@ async function capture() {
     waitUntil: "networkidle",
   });
 
-  // 폰트 로딩 등 렌더링 안정화 대기
-  await page.waitForTimeout(1000);
+  // 폰트 로딩 완료 대기
+  await page.evaluate(() => document.fonts.ready);
+  await page.waitForTimeout(2000);
 
   await page.screenshot({
     path: resolve(outputPath),

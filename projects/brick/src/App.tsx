@@ -9,17 +9,17 @@ export default function App() {
   return (
     <div className="w-[1280px] mx-auto flex flex-col items-center bg-[#EBEBEB]">
       <div className="h-[19px]" />
-      <Header />
+      <div style={{ transform: 'translateX(0.5px)' }}><Header /></div>
       <div className="h-[16px]" />
-      <Hero />
+      <div style={{ transform: 'translateX(0.5px)' }}><Hero /></div>
       <div className="h-[368px]" />
-      <Modules />
+      <div style={{ transform: 'translateX(0.5px)' }}><Modules /></div>
       <div className="h-[4px]" />
-      <Process />
+      <div style={{ transform: 'translateX(0.5px)' }}><Process /></div>
       <div className="h-[4px]" />
-      <CTA />
+      <div style={{ transform: 'translateX(-1.5px)' }}><CTA /></div>
       <div className="h-[422px]" />
-      <Footer />
+      <div style={{ transform: 'translateX(0.5px)' }}><Footer /></div>
       <div className="h-[10px]" />
     </div>
   )

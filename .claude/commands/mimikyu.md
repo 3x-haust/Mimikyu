@@ -9,13 +9,16 @@ Figma 디자인 URL을 받아 픽셀 퍼펙트하게 React + Tailwind CSS로 재
 
 ## 워크플로우
 
-### 1. Figma 데이터 추출
+### 1. Figma 데이터 추출 및 저장
 - `mcp__framelink-figma__get_figma_data`로 디자인 구조 + 스타일 데이터 가져오기
 - `mcp__framelink-figma__download_figma_images`로 이미지 에셋 다운로드
 - `mcp__figma__view_node`로 시각 확인
 - Fallback: `curl -H "X-Figma-Token: $FIGMA_ACCESS_TOKEN"` 사용
+- **추출한 Figma 데이터를 `designs/figma-data.json`에 저장한다** — MCP에서 받은 원본 JSON을 그대로 저장
+- 이후 검증 루프에서 MCP를 다시 호출하지 않고 이 파일을 참조하여 수정한다
 
 ### 2. 디자인 분석
+- `designs/figma-data.json`을 읽어서 분석한다
 - absoluteBoundingBox에서 각 요소의 정확한 x, y, width, height 추출
 - fills → 배경색/그라디언트, style → 폰트, cornerRadius → border-radius
 - 부모 프레임 기준 상대 좌표 계산: `left = child.x - parent.x`
@@ -48,6 +51,8 @@ pip3 install Pillow 2>/dev/null || pip install Pillow
 - 색상은 hex 그대로: `bg-[#1E1E2E]`, `text-[#666666]`
 - fills=0인 빈 사각형(이미지 없음)은 렌더링하지 않음
 - SVG 아이콘은 인라인 컴포넌트로
+- **텍스트 요소에는 반드시 `whitespace-nowrap` 적용** — 텍스트가 width 부족으로 줄바꿈되면 레이아웃이 깨짐. Figma에서 한 줄로 표시되는 텍스트는 코드에서도 반드시 한 줄이어야 한다
+- 텍스트 컨테이너의 width는 Figma의 boundingBox width 이상으로 설정하여 텍스트가 넘치지 않게 한다
 
 ### 5. 이미지 사용 원칙
 **이미지는 코드로 재현 불가능한 에셋에만 사용한다:**
@@ -84,14 +89,55 @@ python3 ../../scripts/compare.py designs/desktop.png screenshots/v1.png \
 
 ### 8. 수정 → 재검증 반복
 1. 히트맵에서 빨간 영역 확인 (빨강 = 위치 + 색상 불일치)
-2. 해당 컴포넌트의 좌표/스타일/색상 수정
+2. `designs/figma-data.json`에서 해당 영역의 원본 좌표/스타일/색상을 다시 확인하고 코드 수정
 3. 스크린샷 재캡처 → 비교
-4. **95% 이상 달성할 때까지 반복** (폰트 렌더링 차이로 99.9%는 코드만으로 불가)
+4. **overall_match 99%+ AND 모든 region 각각 99%+ 달성할 때까지 반복**
+
+### 8.5. 색상 불일치 집중 수정 (95%+ 이후 정체 시)
+점수가 95% 이상인데 더 오르지 않으면, 대부분 **색상 불일치**가 원인이다.
+아래 절차로 색상을 집중 수정한다:
+
+1. **figma-data.json에서 모든 색상 코드를 추출한다:**
+   - `fills[].color` → `rgba(r*255, g*255, b*255, a)` → hex 변환
+   - `strokes[].color` → 동일하게 변환
+   - `style.fills`, `backgroundColor` 등 모든 색상 속성
+   - Figma 색상은 0~1 범위이므로 반드시 `Math.round(value * 255)`로 변환
+
+2. **현재 코드의 모든 색상 코드를 grep으로 추출한다:**
+   ```bash
+   grep -oE '#[0-9a-fA-F]{3,8}' src/**/*.tsx | sort -u
+   ```
+
+3. **Figma 원본 색상과 코드 색상을 1:1 대조한다:**
+   - `#666` → `#666666` 처럼 축약 표기 차이 확인
+   - `opacity` 가 별도로 있는지 확인 (Figma opacity × fill opacity)
+   - 그라디언트의 각 color stop 값 확인
+
+4. **불일치하는 색상을 Figma 원본 hex로 교체한다**
+
+흔한 색상 불일치 원인:
+- **축약 hex**: `#666` vs `#666666` — 항상 6자리 hex 사용
+- **opacity 미반영**: Figma의 `opacity: 0.8`이 CSS에 없음 → `opacity-[0.8]` 또는 `bg-[#RRGGBB]/80`
+- **fills의 color가 0~1 범위**: `{r: 0.12, g: 0.12, b: 0.18}` → `#1E1E2E` (반드시 *255 후 반올림)
+- **배경 그라디언트**: Figma의 `gradientStops`를 CSS `bg-gradient-to-*`로 정확히 변환
+- **stroke를 border로**: `strokes[].color`를 `border-[색상]`으로 정확히 반영
+
+## 완료 조건 — 반드시 준수
+
+**아래 조건을 모두 만족하기 전에는 절대 작업을 종료하지 않는다:**
+
+- `overall_match` ≥ 99%
+- `regions`의 **모든 9개 영역**(top-left, top-center, top-right, mid-left, mid-center, mid-right, bot-left, bot-center, bot-right) **각각** ≥ 99%
+
+**위반 시 행동:**
+- 하나의 region이라도 99% 미만이면 → 해당 영역의 좌표를 계산하여 집중 수정
+- 3회 연속 점수가 오르지 않으면 → 8.5 색상 불일치 집중 수정 단계를 반드시 실행
+- "더 이상 개선이 어렵다", "충분히 좋다" 등의 판단 금지 — **수치가 조건을 만족할 때만 종료**
 
 ## 비교 결과 해석
 | 점수 | 상태 | 조치 |
 |------|------|------|
-| 95%+ | 완벽 (폰트 안티앨리어싱 차이 수준) | 완료 |
+| 99%+ | 완벽 (폰트 안티앨리어싱 차이 수준) | 완료 |
 | 85-95% | 미세 조정 필요 | 폰트, 색상, 간격 확인 |
 | 85% 미만 | 구조적 차이 | 레이아웃 + 좌표 재검토 |
 

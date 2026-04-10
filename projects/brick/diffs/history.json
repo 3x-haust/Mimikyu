@@ -52,5 +52,419 @@
       "bot-center": 96.8,
       "bot-right": 99.3
     }
+  },
+  {
+    "iteration": 4,
+    "overall_match": 96.7,
+    "bg_match": null,
+    "heatmap": "diffs/v4_diff_heatmap.png",
+    "overlay": "diffs/v4_diff_overlay.png",
+    "regions": {
+      "top-left": 93.5,
+      "top-center": 98.0,
+      "top-right": 98.9,
+      "mid-left": 92.8,
+      "mid-center": 94.7,
+      "mid-right": 97.2,
+      "bot-left": 99.1,
+      "bot-center": 96.8,
+      "bot-right": 99.3
+    }
+  },
+  {
+    "iteration": 5,
+    "overall_match": 96.9,
+    "bg_match": null,
+    "heatmap": "diffs/v5_diff_heatmap.png",
+    "overlay": "diffs/v5_diff_overlay.png",
+    "regions": {
+      "top-left": 93.9,
+      "top-center": 98.2,
+      "top-right": 99.0,
+      "mid-left": 93.1,
+      "mid-center": 94.9,
+      "mid-right": 97.3,
+      "bot-left": 99.1,
+      "bot-center": 97.1,
+      "bot-right": 99.4
+    }
+  },
+  {
+    "iteration": 6,
+    "overall_match": 96.9,
+    "bg_match": null,
+    "heatmap": "diffs/v6_diff_heatmap.png",
+    "overlay": "diffs/v6_diff_overlay.png",
+    "regions": {
+      "top-left": 94.1,
+      "top-center": 98.3,
+      "top-right": 99.0,
+      "mid-left": 93.1,
+      "mid-center": 94.9,
+      "mid-right": 97.3,
+      "bot-left": 99.1,
+      "bot-center": 97.2,
+      "bot-right": 99.4
+    }
+  },
+  {
+    "iteration": 7,
+    "overall_match": 97.1,
+    "bg_match": null,
+    "heatmap": "diffs/v7_diff_heatmap.png",
+    "overlay": "diffs/v7_diff_overlay.png",
+    "regions": {
+      "top-left": 94.3,
+      "top-center": 98.2,
+      "top-right": 99.3,
+      "mid-left": 93.5,
+      "mid-center": 95.2,
+      "mid-right": 97.7,
+      "bot-left": 99.0,
+      "bot-center": 97.2,
+      "bot-right": 99.3
+    }
+  },
+  {
+    "iteration": 8,
+    "overall_match": 97.1,
+    "bg_match": null,
+    "heatmap": "diffs/v8_diff_heatmap.png",
+    "overlay": "diffs/v8_diff_overlay.png",
+    "regions": {
+      "top-left": 94.3,
+      "top-center": 98.2,
+      "top-right": 99.3,
+      "mid-left": 93.5,
+      "mid-center": 95.2,
+      "mid-right": 97.7,
+      "bot-left": 99.0,
+      "bot-center": 97.2,
+      "bot-right": 99.3
+    }
+  },
+  {
+    "iteration": 9,
+    "overall_match": 96.9,
+    "bg_match": null,
+    "heatmap": "diffs/v9_diff_heatmap.png",
+    "overlay": "diffs/v9_diff_overlay.png",
+    "regions": {
+      "top-left": 94.1,
+      "top-center": 98.1,
+      "top-right": 99.3,
+      "mid-left": 93.2,
+      "mid-center": 95.0,
+      "mid-right": 97.5,
+      "bot-left": 99.0,
+      "bot-center": 96.9,
+      "bot-right": 99.2
+    }
+  },
+  {
+    "iteration": 10,
+    "overall_match": 97.1,
+    "bg_match": null,
+    "heatmap": "diffs/v10_diff_heatmap.png",
+    "overlay": "diffs/v10_diff_overlay.png",
+    "regions": {
+      "top-left": 94.3,
+      "top-center": 98.2,
+      "top-right": 99.3,
+      "mid-left": 93.5,
+      "mid-center": 95.2,
+      "mid-right": 97.7,
+      "bot-left": 99.0,
+      "bot-center": 97.2,
+      "bot-right": 99.3
+    }
+  },
+  {
+    "iteration": 11,
+    "overall_match": 97.1,
+    "bg_match": null,
+    "heatmap": "diffs/v11_diff_heatmap.png",
+    "overlay": "diffs/v11_diff_overlay.png",
+    "regions": {
+      "top-left": 94.3,
+      "top-center": 98.2,
+      "top-right": 99.3,
+      "mid-left": 93.5,
+      "mid-center": 95.2,
+      "mid-right": 97.7,
+      "bot-left": 99.0,
+      "bot-center": 97.2,
+      "bot-right": 99.3
+    }
+  },
+  {
+    "iteration": 12,
+    "overall_match": 97.1,
+    "bg_match": null,
+    "heatmap": "diffs/v12_diff_heatmap.png",
+    "overlay": "diffs/v12_diff_overlay.png",
+    "regions": {
+      "top-left": 94.3,
+      "top-center": 98.2,
+      "top-right": 99.3,
+      "mid-left": 93.5,
+      "mid-center": 95.2,
+      "mid-right": 97.7,
+      "bot-left": 99.0,
+      "bot-center": 97.2,
+      "bot-right": 99.3
+    }
+  },
+  {
+    "iteration": 13,
+    "overall_match": 96.9,
+    "bg_match": null,
+    "heatmap": "diffs/v13_diff_heatmap.png",
+    "overlay": "diffs/v13_diff_overlay.png",
+    "regions": {
+      "top-left": 94.3,
+      "top-center": 98.1,
+      "top-right": 99.4,
+      "mid-left": 92.9,
+      "mid-center": 94.5,
+      "mid-right": 97.2,
+      "bot-left": 99.1,
+      "bot-center": 97.4,
+      "bot-right": 99.2
+    }
+  },
+  {
+    "iteration": 14,
+    "overall_match": 97.1,
+    "bg_match": null,
+    "heatmap": "diffs/v14_diff_heatmap.png",
+    "overlay": "diffs/v14_diff_overlay.png",
+    "regions": {
+      "top-left": 94.3,
+      "top-center": 98.2,
+      "top-right": 99.3,
+      "mid-left": 93.5,
+      "mid-center": 95.2,
+      "mid-right": 97.7,
+      "bot-left": 99.0,
+      "bot-center": 97.2,
+      "bot-right": 99.3
+    }
+  },
+  {
+    "iteration": 15,
+    "overall_match": 97.1,
+    "bg_match": null,
+    "heatmap": "diffs/v15_diff_heatmap.png",
+    "overlay": "diffs/v15_diff_overlay.png",
+    "regions": {
+      "top-left": 94.3,
+      "top-center": 98.2,
+      "top-right": 99.3,
+      "mid-left": 93.5,
+      "mid-center": 95.2,
+      "mid-right": 97.6,
+      "bot-left": 99.1,
+      "bot-center": 97.3,
+      "bot-right": 99.4
+    }
+  },
+  {
+    "iteration": 16,
+    "overall_match": 94.4,
+    "bg_match": null,
+    "heatmap": "diffs/v16_diff_heatmap.png",
+    "overlay": "diffs/v16_diff_overlay.png",
+    "regions": {
+      "top-left": 88.3,
+      "top-center": 94.9,
+      "top-right": 94.9,
+      "mid-left": 90.1,
+      "mid-center": 93.4,
+      "mid-right": 96.3,
+      "bot-left": 98.4,
+      "bot-center": 94.6,
+      "bot-right": 98.9
+    }
+  },
+  {
+    "iteration": 17,
+    "overall_match": 97.1,
+    "bg_match": null,
+    "heatmap": "diffs/v17_diff_heatmap.png",
+    "overlay": "diffs/v17_diff_overlay.png",
+    "regions": {
+      "top-left": 94.3,
+      "top-center": 98.2,
+      "top-right": 99.3,
+      "mid-left": 93.5,
+      "mid-center": 95.2,
+      "mid-right": 97.7,
+      "bot-left": 99.0,
+      "bot-center": 97.2,
+      "bot-right": 99.3
+    }
+  },
+  {
+    "iteration": 18,
+    "overall_match": 97.1,
+    "bg_match": null,
+    "heatmap": "diffs/v18_diff_heatmap.png",
+    "overlay": "diffs/v18_diff_overlay.png",
+    "regions": {
+      "top-left": 94.3,
+      "top-center": 98.2,
+      "top-right": 99.3,
+      "mid-left": 93.5,
+      "mid-center": 95.2,
+      "mid-right": 97.7,
+      "bot-left": 99.0,
+      "bot-center": 97.2,
+      "bot-right": 99.3
+    }
+  },
+  {
+    "iteration": 19,
+    "overall_match": 97.1,
+    "bg_match": null,
+    "heatmap": "diffs/v19_diff_heatmap.png",
+    "overlay": "diffs/v19_diff_overlay.png",
+    "regions": {
+      "top-left": 94.3,
+      "top-center": 98.2,
+      "top-right": 99.3,
+      "mid-left": 93.5,
+      "mid-center": 95.2,
+      "mid-right": 97.7,
+      "bot-left": 99.0,
+      "bot-center": 97.2,
+      "bot-right": 99.3
+    }
+  },
+  {
+    "iteration": 21,
+    "overall_match": 97.1,
+    "bg_match": null,
+    "heatmap": "diffs/v21_diff_heatmap.png",
+    "overlay": "diffs/v21_diff_overlay.png",
+    "regions": {
+      "top-left": 94.3,
+      "top-center": 98.2,
+      "top-right": 99.3,
+      "mid-left": 93.5,
+      "mid-center": 95.2,
+      "mid-right": 97.7,
+      "bot-left": 99.0,
+      "bot-center": 97.2,
+      "bot-right": 99.3
+    }
+  },
+  {
+    "iteration": 20,
+    "overall_match": 97.1,
+    "bg_match": 99.5,
+    "heatmap": "diffs/v20_diff_heatmap.png",
+    "overlay": "diffs/v20_diff_overlay.png",
+    "regions": {
+      "top-left": 94.3,
+      "top-center": 98.2,
+      "top-right": 99.3,
+      "mid-left": 93.5,
+      "mid-center": 95.2,
+      "mid-right": 97.7,
+      "bot-left": 99.0,
+      "bot-center": 97.2,
+      "bot-right": 99.3
+    }
+  },
+  {
+    "iteration": 22,
+    "overall_match": 97.1,
+    "bg_match": null,
+    "heatmap": "diffs/v22_diff_heatmap.png",
+    "overlay": "diffs/v22_diff_overlay.png",
+    "regions": {
+      "top-left": 94.9,
+      "top-center": 98.2,
+      "top-right": 99.2,
+      "mid-left": 93.2,
+      "mid-center": 95.1,
+      "mid-right": 97.4,
+      "bot-left": 99.0,
+      "bot-center": 97.3,
+      "bot-right": 99.3
+    }
+  },
+  {
+    "iteration": 23,
+    "overall_match": 97.1,
+    "bg_match": null,
+    "heatmap": "diffs/v23_diff_heatmap.png",
+    "overlay": "diffs/v23_diff_overlay.png",
+    "regions": {
+      "top-left": 94.3,
+      "top-center": 98.2,
+      "top-right": 99.3,
+      "mid-left": 93.5,
+      "mid-center": 95.2,
+      "mid-right": 97.7,
+      "bot-left": 99.0,
+      "bot-center": 97.2,
+      "bot-right": 99.3
+    }
+  },
+  {
+    "iteration": 24,
+    "overall_match": 97.1,
+    "bg_match": null,
+    "heatmap": "diffs/v24_diff_heatmap.png",
+    "overlay": "diffs/v24_diff_overlay.png",
+    "regions": {
+      "top-left": 94.4,
+      "top-center": 98.2,
+      "top-right": 99.4,
+      "mid-left": 93.3,
+      "mid-center": 95.0,
+      "mid-right": 97.6,
+      "bot-left": 99.1,
+      "bot-center": 97.6,
+      "bot-right": 99.3
+    }
+  },
+  {
+    "iteration": 25,
+    "overall_match": 97.1,
+    "bg_match": null,
+    "heatmap": "diffs/v25_diff_heatmap.png",
+    "overlay": "diffs/v25_diff_overlay.png",
+    "regions": {
+      "top-left": 94.9,
+      "top-center": 98.4,
+      "top-right": 99.4,
+      "mid-left": 93.0,
+      "mid-center": 94.9,
+      "mid-right": 97.4,
+      "bot-left": 99.0,
+      "bot-center": 97.3,
+      "bot-right": 99.3
+    }
+  },
+  {
+    "iteration": 26,
+    "overall_match": 97.7,
+    "bg_match": null,
+    "heatmap": "diffs/v26_diff_heatmap.png",
+    "overlay": "diffs/v26_diff_overlay.png",
+    "regions": {
+      "top-left": 95.3,
+      "top-center": 98.4,
+      "top-right": 99.2,
+      "mid-left": 94.5,
+      "mid-center": 96.3,
+      "mid-right": 98.3,
+      "bot-left": 99.3,
+      "bot-center": 98.2,
+      "bot-right": 99.5
+    }
   }
 ]

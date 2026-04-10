@@ -22,58 +22,40 @@ function ModuleCard({
 }: ModuleCardProps) {
   return (
     <div className="relative w-[360px] h-[200px]">
-      {/* Card border */}
       <div className="absolute inset-0 w-[360px] h-[200px] bg-[#FFFFFF] border-[2.472766876220703px] border-[#DEDEDE] rounded-[12.3638334274292px]" />
-      {/* Icon background */}
       <div className="absolute left-[17px] top-[18px] w-[50px] h-[50px] bg-[#F5F5F5] rounded-[12.3638334274292px]" />
-      {/* Small icon */}
       <img
         src={smallIcon}
         className="absolute"
-        style={{
-          left: `${smallIconOffset.x}px`,
-          top: `${smallIconOffset.y}px`,
-          width: `${smallIconSize.w}px`,
-          height: `${smallIconSize.h}px`,
-        }}
+        style={{ left: `${smallIconOffset.x}px`, top: `${smallIconOffset.y}px`, width: `${smallIconSize.w}px`, height: `${smallIconSize.h}px` }}
         alt=""
       />
-      {/* Large faded icon */}
       <img
         src={largeIcon}
         className="absolute"
-        style={{
-          left: `${largeIconOffset.x}px`,
-          top: `${largeIconOffset.y}px`,
-          width: `${largeIconSize.w}px`,
-          height: `${largeIconSize.h}px`,
-        }}
+        style={{ left: `${largeIconOffset.x}px`, top: `${largeIconOffset.y}px`, width: `${largeIconSize.w}px`, height: `${largeIconSize.h}px` }}
         alt=""
       />
-      {/* Price */}
       <span
-        className="absolute top-[66.24px] font-[Pretendard] font-medium text-[12.3638334274292px] leading-[0.8em] tracking-[-0.005em] text-[#949494]"
+        className="absolute top-[66.24px] font-[Pretendard] font-medium text-[12.3638334274292px] leading-[10px] tracking-[-0.005em] text-[#949494] whitespace-nowrap"
         style={{ left: '282.19px', width: `${priceWidth}px` }}
       >
         {price}
       </span>
-      {/* Title */}
       <span
-        className="absolute left-[17px] top-[86px] font-[Pretendard] font-semibold text-[22px] leading-[0.8em] tracking-[-0.005em] text-[#000000]"
+        className="absolute left-[17px] top-[86px] font-[Pretendard] font-semibold text-[22px] leading-[18px] tracking-[-0.005em] text-[#000000] whitespace-nowrap"
         style={{ width: `${titleWidth}px` }}
       >
         {title}
       </span>
-      {/* Description */}
       <span
-        className="absolute left-[17px] top-[127px] font-[Pretendard] font-semibold text-[11px] leading-[1.2em] tracking-[-0.005em] text-[#575757]"
+        className="absolute left-[17px] top-[127px] font-[Pretendard] font-semibold text-[11px] leading-[13px] tracking-[-0.005em] text-[#575757] whitespace-nowrap"
         style={{ width: `${descWidth}px` }}
       >
         {description}
       </span>
-      {/* Tag */}
       <div className="absolute left-[17px] top-[167px] flex flex-row justify-center items-center gap-[10px] bg-[#EBEBEB] rounded-[28.848947525024414px]" style={{ padding: '1px 9px', height: '17px' }}>
-        <span className="font-[Pretendard] font-medium text-[9px] leading-[1.45em] tracking-[-0.005em] text-[#000000]">
+        <span className="font-[Pretendard] font-medium text-[9px] leading-[1.45em] tracking-[-0.005em] text-[#000000] whitespace-nowrap">
           {tag}
         </span>
       </div>
@@ -84,7 +66,6 @@ function ModuleCard({
 export default function Modules() {
   return (
     <section className="relative w-[1259px] h-[977px]">
-      {/* Background */}
       <div className="absolute inset-0 w-[1259px] h-[977px] bg-[#FFFFFF] rounded-[20px]" />
 
       {/* Badge */}
@@ -92,31 +73,29 @@ export default function Modules() {
         className="absolute left-[64px] top-[82px] flex flex-row justify-center items-center gap-[8px] bg-[#F5F5F5] border border-[#BFBFBF] rounded-[25px]"
         style={{ padding: '12px 16px', height: '35px' }}
       >
-        <span className="font-[Inter] font-medium text-[14px] leading-[1.45em] tracking-[-0.005em] text-[#0D0D0D]">
+        <span className="font-[Inter] font-medium text-[14px] leading-[1.45em] tracking-[-0.005em] text-[#0D0D0D] whitespace-nowrap">
           BRICK MARKET
         </span>
       </div>
 
-      {/* Title */}
-      <h2 className="absolute left-[64px] top-[148px] w-[469px] h-[118px] font-[Pretendard] font-extrabold text-[64px] leading-[0.8em] tracking-[-0.005em] text-[#000000] whitespace-pre-line">
+      {/* Title - bbox 469x118, 2 lines of 64px → leading 59px */}
+      <h2 className="absolute left-[64px] top-[148px] w-[469px] h-[118px] font-[Pretendard] font-extrabold text-[64px] leading-[59px] tracking-[-0.005em] text-[#000000] whitespace-pre-line">
         {"현대적인 팀을 위한\n모듈형 컴포넌트."}
       </h2>
 
-      {/* Subtitle */}
-      <p className="absolute left-[64px] top-[296px] w-[515px] h-[54px] font-[Pretendard] font-medium text-[24px] leading-[0.8em] tracking-[-0.005em] text-[#666666] whitespace-pre-line">
+      {/* Subtitle - bbox 515x54, 2 lines of 24px → leading 27px */}
+      <p className="absolute left-[64px] top-[296px] w-[515px] h-[54px] font-[Pretendard] font-medium text-[24px] leading-[27px] tracking-[-0.005em] text-[#666666] whitespace-pre-line">
         {"새로 발명하지 마세요. 검증된 프리빌트 모듈을 사용하여\n개발 속도를 획기적으로 높이세요."}
       </p>
 
       {/* Browse all modules link */}
       <div className="absolute left-[997px] top-[317px] w-[202px] h-[32px]">
-        <span className="absolute left-0 top-0 w-[173px] h-[32px] font-[Inter] font-medium text-[22px] leading-[1.45em] tracking-[-0.005em] text-[#000000]">
+        <span className="absolute left-0 top-0 w-[173px] h-[32px] font-[Inter] font-medium text-[22px] leading-[1.45em] tracking-[-0.005em] text-[#000000] whitespace-nowrap">
           모든 모듈 둘러보기
         </span>
-        <div className="absolute left-[178px] top-[4px] w-[24px] h-[24px]">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute left-[5px] top-[5px]">
-            <path d="M7 1L13 7M13 7L7 13M13 7H1" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45, 7, 7)" />
-          </svg>
-        </div>
+        <svg className="absolute left-[178px] top-[4px]" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 5L19 12M19 12L12 19M19 12H5" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       </div>
 
       {/* Row 1 */}
