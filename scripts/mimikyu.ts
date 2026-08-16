@@ -11,7 +11,10 @@
  */
 import { execSync, spawn, type ChildProcess } from "child_process";
 import { existsSync, readFileSync, mkdirSync } from "fs";
-import { resolve } from "path";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
+
+const scriptDir = dirname(fileURLToPath(import.meta.url));
 
 const args = process.argv.slice(2);
 
@@ -25,6 +28,8 @@ interface ParsedArgs {
   history: boolean;
   bgOnly: boolean;
   sideBySide: boolean;
+  verifyData: string | undefined;
+  nodeId: string | undefined;
 }
 
 function parseArgs(): ParsedArgs {
@@ -50,6 +55,8 @@ function parseArgs(): ParsedArgs {
     history: args.includes("--history"),
     bgOnly: args.includes("--bg-only"),
     sideBySide: args.includes("--side-by-side"),
+    verifyData: getFlag("--verify"),
+    nodeId: getFlag("--node-id"),
   };
 }
 
@@ -162,7 +169,7 @@ function showHistory(): void {
 }
 
 async function main() {
-  const { designPath, width, height, threshold, skipServer, port, history, bgOnly, sideBySide } =
+  const { designPath, width, height, threshold, skipServer, port, history, bgOnly, sideBySide, verifyData, nodeId } =
     parseArgs();
 
   if (history) {
@@ -188,6 +195,8 @@ Options:
   --history         반복 히스토리 보기
   --bg-only         배경만 비교 (compare.py pass-through)
   --side-by-side    나란히 비교 출력 (compare.py pass-through)
+  --verify FILE     figma-data.json 기준 구조 검증 (verify.ts)
+  --node-id ID      검증할 Figma 노드 ID (기본: 첫 번째 노드)
 
 Example:
   pnpm mimikyu designs/dashboard.png
@@ -243,7 +252,7 @@ Example:
     // 2. Screenshot 캡처
     console.log(`Capturing screenshot (${viewportWidth}x${viewportHeight}) -> ${screenshotPath}`);
     execSync(
-      `pnpm screenshot ${screenshotPath} ${viewportWidth} ${viewportHeight}`,
+      `PORT=${port} npx tsx ${resolve(scriptDir, "screenshot.ts")} ${screenshotPath} ${viewportWidth} ${viewportHeight}`,
       { stdio: "inherit" }
     );
 
@@ -258,7 +267,7 @@ Example:
       .join(" ");
 
     const compareCmd = [
-      `python3 scripts/compare.py`,
+      `python3 ${resolve(scriptDir, "compare.py")}`,
       `"${resolve(designPath)}"`,
       `"${resolve(screenshotPath)}"`,
       `--regions`,
@@ -272,6 +281,24 @@ Example:
     const result = execSync(compareCmd, { encoding: "utf-8" });
 
     const data = JSON.parse(result);
+
+    // 5. 구조적 검증 (선택) — figma-data.json과 현재 DOM을 노드 단위로 대조
+    if (verifyData) {
+      console.log("\n=== Structural Verify ===\n");
+      const verifyCmd = [
+        `npx tsx ${resolve(scriptDir, "verify.ts")}`,
+        `"${resolve(verifyData)}"`,
+        `--port ${port}`,
+        nodeId ? `--node-id ${nodeId}` : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
+      try {
+        execSync(verifyCmd, { stdio: "inherit" });
+      } catch {
+        console.log("\n[verify] structural mismatches found — fix these before re-running");
+      }
+    }
 
     // 4. Summary table
     const regions: Record<string, number> = data.regions ?? {};

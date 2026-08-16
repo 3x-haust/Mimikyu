@@ -79,19 +79,25 @@ curl -s -H "X-Figma-Token: $TOKEN" \
 # dev server 시작
 cd projects/<name> && pnpm dev &
 
-# 스크린샷 캡처
-PORT=<port> npx tsx ../../scripts/screenshot.ts screenshots/v1.png <width> <height>
+# 한 번에: 스크린샷 → 픽셀 비교 → 구조 검증
+npx tsx ../../scripts/mimikyu.ts designs/desktop.png --width <W> --height <H> \
+  --port <port> --verify designs/figma-data.json [--node-id <NODE_ID>] --skip-server
 
+# 개별 실행
+# 스크린샷
+PORT=<port> npx tsx ../../scripts/screenshot.ts screenshots/v1.png <width> <height>
 # 픽셀 비교
-python3 ../../scripts/compare.py designs/desktop.png screenshots/v1.png \
-  --regions --iteration 1
+python3 ../../scripts/compare.py designs/desktop.png screenshots/v1.png --regions --iteration 1
+# 구조 검증 (figma-data.json vs DOM — 노드별 expected/actual)
+npx tsx ../../scripts/verify.ts designs/figma-data.json --port <port> [--node-id <NODE_ID>]
 ```
 
 ### 8. 수정 → 재검증 반복
-1. 히트맵에서 빨간 영역 확인 (빨강 = 위치 + 색상 불일치)
-2. `designs/figma-data.json`에서 해당 영역의 원본 좌표/스타일/색상을 다시 확인하고 코드 수정
-3. 스크린샷 재캡처 → 비교
-4. **overall_match 99%+ AND 모든 region 각각 99%+ 달성할 때까지 반복**
+1. **verify.ts의 mismatch부터 먼저 고친다** (expected/actual 수치가 곧 수정값 — 픽셀 히트맵 추측 금지)
+2. 히트맵에서 빨간 영역 확인 (빨강 = 위치 + 색상 불일치)
+3. `designs/figma-data.json`에서 해당 영역의 원본 좌표/스타일/색상을 다시 확인하고 코드 수정
+4. 스크린샷 재캡처 → 비교
+5. **overall_match 99%+ AND 모든 region 각각 99%+ AND verify.ts mismatch 0 달성할 때까지 반복**
 
 ### 8.5. 색상 불일치 집중 수정 (95%+ 이후 정체 시)
 점수가 95% 이상인데 더 오르지 않으면, 대부분 **색상 불일치**가 원인이다.
@@ -128,6 +134,7 @@ python3 ../../scripts/compare.py designs/desktop.png screenshots/v1.png \
 
 - `overall_match` ≥ 99%
 - `regions`의 **모든 9개 영역**(top-left, top-center, top-right, mid-left, mid-center, mid-right, bot-left, bot-center, bot-right) **각각** ≥ 99%
+- **verify.ts mismatch = 0** (구조 검증 exit 0)
 
 **위반 시 행동:**
 - 하나의 region이라도 99% 미만이면 → 해당 영역의 좌표를 계산하여 집중 수정

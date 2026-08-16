@@ -193,11 +193,24 @@ PORT=<port> npx tsx ../../scripts/screenshot.ts screenshots/v1.png <width> <heig
 python3 ../../scripts/compare.py designs/desktop.png screenshots/v1.png \
   --regions --iteration 1
 
-# 4. 결과 확인
+# 4. 구조 검증 (figma-data.json 기준 DOM 대조 — 어디가/무엇이 다른지 수치로)
+npx tsx ../../scripts/verify.ts designs/figma-data.json --port <port> [--node-id <NODE_ID>]
+
+# 한 번에 (위 2~4 통합; 스크린샷→픽셀비교→구조검증)
+npx tsx ../../scripts/mimikyu.ts designs/desktop.png --width <W> --height <H> \
+  --port <port> --verify designs/figma-data.json [--node-id <NODE_ID>] --skip-server
+
+# 5. 결과 확인
 # - diffs/v1_diff_heatmap.png  (빨간색 = 불일치 영역)
 # - diffs/v1_diff_overlay.png  (원본에 차이 오버레이)
 # - stdout JSON (전체/영역별 일치율)
+# - verify.ts stdout (텍스트 노드별 expected vs actual: x, y, color, fontSize, fontWeight, lineHeight, letterSpacing)
 ```
+
+**verify.ts가 중요한 이유**: 픽셀 diff는 "어디가/얼마나"만 알려준다. 95% 이상에서
+정체하는 mismatch(색상 살짝 다름, 라인 몇 px 차이)의 실제 원인은 verify.ts가
+figma-data.json과 DOM을 노드 단위로 대조해 expected/actual 수치로 출력한다.
+수정은 그 수치를 그대로 쓰면 된다 — 히트맵을 눈으로 보고 추측하지 않는다.
 
 옵션:
 - `--regions` : 3x3 그리드 영역별 분석
@@ -209,10 +222,11 @@ python3 ../../scripts/compare.py designs/desktop.png screenshots/v1.png \
 
 ### Phase 6: 수정 → 재검증 반복
 
-1. 히트맵에서 빨간 영역 확인 (빨강 = 위치 불일치 + 색상 불일치 모두 포함)
-2. `designs/figma-data.json`에서 해당 영역의 원본 좌표/스타일/색상을 다시 확인하고 코드 수정
-3. 스크린샷 재캡처 → 비교
-4. **overall_match 99%+ AND 모든 region 각각 99%+ 달성할 때까지 반복**
+1. **verify.ts의 mismatch부터 먼저 고친다** (expected/actual 수치가 곧 수정값)
+2. 히트맵에서 빨간 영역 확인 (빨강 = 위치 불일치 + 색상 불일치 모두 포함)
+3. `designs/figma-data.json`에서 해당 영역의 원본 좌표/스타일/색상을 다시 확인하고 코드 수정
+4. 스크린샷 재캡처 → 비교
+5. **overall_match 99%+ AND 모든 region 각각 99%+ AND verify.ts mismatch 0 달성할 때까지 반복**
 
 ### Phase 6.5: 색상 불일치 집중 수정 (95%+ 이후 정체 시)
 
@@ -250,6 +264,7 @@ python3 ../../scripts/compare.py designs/desktop.png screenshots/v1.png \
 
 - `overall_match` ≥ 99%
 - `regions`의 **모든 9개 영역**(top-left ~ bot-right) **각각** ≥ 99%
+- `verify.ts` mismatch = 0 (exit code 0)
 
 **위반 시 행동:**
 - 하나의 region이라도 99% 미만이면 → 해당 영역의 좌표를 계산하여 집중 수정
