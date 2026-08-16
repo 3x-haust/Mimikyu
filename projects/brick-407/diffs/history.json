@@ -1,0 +1,38 @@
+[
+  {
+    "iteration": 1,
+    "overall_match": 90.9,
+    "bg_match": null,
+    "heatmap": "diffs/v1_diff_heatmap.png",
+    "overlay": "diffs/v1_diff_overlay.png",
+    "regions": {
+      "top-left": 88.8,
+      "top-center": 91.7,
+      "top-right": 88.2,
+      "mid-left": 90.1,
+      "mid-center": 88.8,
+      "mid-right": 94.3,
+      "bot-left": 90.7,
+      "bot-center": 91.5,
+      "bot-right": 93.6
+    }
+  },
+  {
+    "iteration": 2,
+    "overall_match": 93.3,
+    "bg_match": null,
+    "heatmap": "diffs/v2_diff_heatmap.png",
+    "overlay": "diffs/v2_diff_overlay.png",
+    "regions": {
+      "top-left": 91.0,
+      "top-center": 91.1,
+      "top-right": 87.7,
+      "mid-left": 94.8,
+      "mid-center": 95.0,
+      "mid-right": 94.6,
+      "bot-left": 95.4,
+      "bot-center": 94.2,
+      "bot-right": 96.3
+    }
+  }
+]

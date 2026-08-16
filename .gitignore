@@ -4,3 +4,5 @@ dist/
 .vite/
 .mcp.json
 .omc
+.omo
+.omx
