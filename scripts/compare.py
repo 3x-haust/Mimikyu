@@ -33,20 +33,30 @@ import argparse
 
 
 def auto_resize_design(design: Image.Image, screenshot: Image.Image) -> Image.Image:
-    """디자인 이미지를 스크린샷 크기에 맞게 자동 리사이즈."""
+    """디자인 이미지를 스크린샷 크기에 맞게 맞춰 반환.
+
+    기본적으로 크기가 다르면 **하드 에러**를 낸다. 같은 width/height 에서만
+    안티앨리어싱 차이를 흡수하려고 리사이즈하는 게 아니라, 크기가 다른 채로
+    무조건 리사이즈하면 "실제 렌더링 폭과 디자인 폭이 다를 때" mismatch 가
+    가려진다(같은 폭이어서 AI 가 못 알아차림).
+    """
     if design.size != screenshot.size:
-        print(
-            f"[resize] design {design.size} -> screenshot {screenshot.size}",
-            file=sys.stderr,
+        raise ValueError(
+            f"[dimension-mismatch] design {design.size} != screenshot {screenshot.size}. "
+            "논과 디자인/렌더링 폭이 다르면 픽셀 비교가 의미 없다. "
+            "같은 뷰포트(폭)로 스크린샷을 다시 찍고, 그 폭이 디자인 export 폭과 일치하는지 확인하세요. "
+            "(width-dependent 레이아웃 차이를 숨기지 않도록 하드 실패)"
         )
-        design = design.resize(screenshot.size, Image.LANCZOS)
     return design
 
 
 def calc_match_rate(img1: Image.Image, img2: Image.Image, threshold: int = 30) -> float:
     """두 이미지의 픽셀 일치율 계산 (threshold 이내 차이는 일치로 간주)"""
     if img1.size != img2.size:
-        img2 = img2.resize(img1.size, Image.LANCZOS)
+        raise ValueError(
+            f"[dimension-mismatch] 비교 이미지 크기 불일치: {img1.size} vs {img2.size}. "
+            "같은 폭/높이로 재캡처하세요. (이전에는 조용히 리사이즈해서 폭 차이를 가렸음)"
+        )
 
     diff = ImageChops.difference(img1.convert("RGB"), img2.convert("RGB"))
     pixels = list(diff.getdata())

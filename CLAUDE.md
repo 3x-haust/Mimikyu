@@ -7,25 +7,14 @@ Figma MCP (Framelink + 공식)로 디자인 데이터를 추출하고, Playwrigh
 ## 프로젝트 구조
 ```
 Mimikyu/
-├── scripts/           # 공용 스크립트 (screenshot.ts, compare.py, mimikyu.ts)
-├── projects/          # 각 프로젝트별 독립 디렉토리
-│   └── <project>/
-│       ├── package.json       # 독립 Vite+React 프로젝트
-│       ├── vite.config.ts
-│       ├── index.html
-│       ├── designs/           # Figma export 원본 이미지
-│       ├── screenshots/       # Playwright 캡처 결과
-│       ├── diffs/             # 히트맵, 오버레이, history.json
-│       ├── public/assets/     # Figma에서 다운로드한 이미지 에셋
-│       └── src/
-│           ├── App.tsx
-│           ├── main.tsx
-│           ├── index.css
-│           └── components/
-└── CLAUDE.md
+├── scripts/           # 공용 스크립트 (screenshot.ts, compare.py, mimikyu.ts, verify.ts)
+└── <각 프로젝트>        # 폴더 구조 강제 없음 (아래 참조)
 ```
 
-**프로젝트는 반드시 `projects/<project-name>/` 안에 생성한다.**
+**폴더 구조를 강제하지 않는다.**
+- 사용자가 경로/기존 프로젝트/폴더 규칙을 주면 → 그대로 따른다 (기존 컨벤션을 존중, 엉뚱한 폴더 추가 금지).
+- 아무 정보가 없으면 → AI가 합리적인 구조를 스스로 정하고 진행한다. 물어보지 않고 진행 (예: 스택 네이티브 스캐폴드 + 앱 옆 designs/screenshots/diffs).
+- 사용자 정보 > AI 자율 판단.
 
 ## 기술 스택
 - React 19 + TypeScript + Tailwind CSS v4 (@tailwindcss/vite) + Vite
@@ -98,18 +87,16 @@ curl -s -H "X-Figma-Token: <TOKEN>" \
   "https://api.figma.com/v1/images/<FILE_KEY>?ids=<NODE_ID>&format=png&scale=1"
 ```
 
-### Phase 2: 프로젝트 셋업
+### Phase 2: 프로젝트 셋업 (폴더 구조 강제 없음)
 
-출력 경로가 지정되면 해당 경로에, 미지정 시 `projects/<name>/`에 프로젝트를 생성한다.
-
+사용자가 경로를 지정하면 그 경로에, 아니면 AI가 합리적인 구조를 스스로 결정해 생성한다.
 ```bash
-# 출력 경로 지정 시: <output-path>/ 에 프로젝트 생성
-# 미지정 시: projects/<name>/ 에 독립 프로젝트 생성
-mkdir -p <target-dir>
+# 경로 지정 시: <target-dir>/ 에 생성
+# 미지정 시: AI가 선정한 위치에 생성 (예: <project>/ 또는 스택 스캐폴드 + designs/screenshots/diffs)
 cd <target-dir>
 
-# package.json, vite.config.ts, tsconfig.json, index.html 생성
-# Vite 포트는 메인(3333)과 겹치지 않게 설정 (3334, 3335, ...)
+# package.json, vite.config.ts, tsconfig.json, index.html 생성 (사용자 지정 스택 기준)
+# Vite 포트는 메인(3333)과 겹치지 않게 설량 (3334, 3335, ...)
 # 한글 폰트 사용시 index.html에 CDN 링크 추가 (Pretendard 등)
 
 pnpm install
@@ -157,6 +144,11 @@ pnpm install
 - 아이콘 → 인라인 SVG로 구현
 - 레이아웃/구조 → absolute positioning으로 구현
 
+**`designs/`와 `screenshots/`는 검증 전용 — 절대 앱 에셋으로 쓰지 않는다:**
+- `designs/desktop.png` (전체페이지 Figma export 참조) 와 `screenshots/*.png` (캡처) 는 diff 측정 전용이다.
+- 이들을 `<img src>`로 참조하거나 `public/`/`assets/`에 복사하거나 import/서빙하면 안 된다.
+- `<img src="/assets/desktop.png">` 같은 식으로 전체 디자인 PNG를 페이지에 넣는 것은 구조 결함이다 — 절대 하지 않는다.
+
 이미지 에셋은 `public/assets/`에 다운로드하여 `<img src="/assets/..." />`로 사용
 
 ### Phase 4: 섹션 간격 계산
@@ -181,6 +173,10 @@ App.tsx에서 각 섹션 사이 간격은 Figma의 절대 좌표로 계산:
 ```
 
 ### Phase 5: 픽셀 비교 검증 루프
+
+**캡처는 전체 페이지 + motion 인지**: `prefers-reduced-motion: reduce` 에뮬레이션,
+스크롤로 whileInView 리빌 트리거, 이미지 eager+decode 대기, `fullPage: true`.
+아래 폴드/애니메이션 섹션도 실제 렌더링된 상태로 캡처한다.
 
 ```bash
 # 1. dev server 시작 (프로젝트 디렉토리에서)

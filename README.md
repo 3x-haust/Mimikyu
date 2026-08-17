@@ -172,6 +172,39 @@ one. When the loop stalls at 95–97% (the classic "color is slightly off / line
 is 3px short" wall), `verify.ts` returns the exact value to fix instead of
 leaving you to guess at a heatmap.
 
+The capture is **full-page and motion-aware**: it emulates
+`prefers-reduced-motion: reduce`, scrolls the page through to trigger
+`whileInView` reveals, forces images `loading=eager` and waits for them to
+decode, then screenshots `fullPage`. This matches how the site really renders
+instead of capturing a half-empty first viewport.
+
+### The "same width hides it" trap (and the fix)
+
+If the design export and the rendered page happen to share the same width and
+height, a real reflow/overlap problem looks like a match — the AI can't tell
+because the two images line up dimensionally even when the *layout* inside is
+broken. This is exactly what happens on a responsive page whose layout
+collapses only at a different (e.g. mobile) width.
+
+Mimikyu defends against this in three ways:
+
+1. **`compare.py` no longer silently resizes.** If the design image and the
+   screenshot differ in size, comparison **hard-fails** instead of resizing
+   and masking the difference. Capture the page at the same width as the
+   design export (the error tells you both sizes).
+2. **`screenshot.ts` warns on rendered-width mismatch.** After load it reads
+   the page's actual `clientWidth` / horizontal overflow. If the page overflows
+   horizontally or renders at a different width than requested, it prints a
+   `[render-width]` warning — so a reflow/overlap at the real width is surfaced.
+3. **`verify.ts` checks for overlapping text elements.** Any two visible text
+   boxes overlapping >30% are reported as a critical mismatch (fails the gate).
+   Pass `--viewport-width` / `--viewport-height` to check a specific (e.g.
+   mobile) width where the layout may collapse.
+
+So: capture at the **exact design export width** for the reference comparison,
+and additionally run `verify.ts --viewport-width <W>` at the widths whose
+layout you care about (phone, tablet) to catch width-dependent overlap.
+
 `figma-data.json` is extracted **once** via Figma MCP/API and reused for the
 whole loop — it is the contract the implementation and the verifier both read.
 
@@ -216,7 +249,12 @@ All of these must pass before the agent may stop:
 [ ] final screenshot + report produced
 ```
 
-If a gate fails the agent is **not done** — it fixes and re-runs.
+If a gate fails the agent is **not done** — it fixes and re-runs. One caveat:
+if the page renders **API-driven content** (sermons/gallery/events) that is
+empty, stubbed, or differs from Figma placeholders, those nodes are reported
+as *unmatched* warnings — not critical mismatches. Run the backend/fixture to
+resolve them; do not loop forever pixel-matching content that only appears
+with data.
 
 ### Stop condition
 

@@ -41,9 +41,11 @@ function flag(name: string): string | undefined {
 const dataPath = argv.find((a) => !a.startsWith("--"));
 const port = parseInt(flag("--port") || "3333", 10);
 const nodeId = flag("--node-id");
+const viewportW = flag("--viewport-width");
+const viewportH = flag("--viewport-height");
 
 if (!dataPath || !existsSync(dataPath)) {
-  console.error("Usage: npx tsx scripts/verify.ts <figma-data.json> [--port N] [--node-id ID]");
+  console.error("Usage: npx tsx scripts/verify.ts <figma-data.json> [--port N] [--node-id ID] [--viewport-width W] [--viewport-height H]");
   process.exit(2);
 }
 
@@ -150,51 +152,130 @@ async function launch() {
 async function main(): Promise<number> {
   const browser = await launch();
   try {
-    const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height }, deviceScaleFactor: 1 });
-  await page.goto(`http://localhost:${port}`, { waitUntil: "networkidle" });
-  await page.evaluate(() => (document as Document & { fonts: FontFaceSet }).fonts.ready);
-  await page.waitForTimeout(1500);
+    const page = await browser.newPage({
+      viewport: { width: viewportW ? parseInt(viewportW, 10) : viewport.width, height: viewportH ? parseInt(viewportH, 10) : viewport.height },
+      deviceScaleFactor: 1
+    });
+    // (중요) motion(reveal) 요소를 강제로 최종 상태로 렌더 — reducedMotion query emulation.
+    // 원본 페이지의 Reveal 컴포넌트는 prefers-reduced-motion: reduce 시 initial=false 로 항상 노출한다.
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto(`http://localhost:${port}`, { waitUntil: "networkidle" });
+    // 폰트 로딩 대기
+    await page.evaluate(() => (document as Document & { fonts: FontFaceSet }).fonts.ready);
 
-  // 모든 텍스트 요소 측정
+    // (중요) 스크롤 진입 시 나타나는 Motion reveal 요소를 전부 트리거하고 맨 위로 복귀.
+    // 아래 폴드의 섹션을 렌더링해야 전체 페이지 검증이 의미 있다.
+    await page.evaluate(async () => {
+      const height = document.body.scrollHeight;
+      for (let y = 0; y <= height; y += 700) {
+        window.scrollTo(0, y);
+        await new Promise((r) => setTimeout(r, 40));
+      }
+      window.scrollTo(0, 0);
+    });
+    // 이미지가 전부 decode 완료될 때까지 대기 (lazy/eager)
+    await page.evaluate(async () => {
+      for (const image of document.images) image.loading = "eager";
+      await Promise.all([...document.images].map((image) =>
+        image.complete ? image.decode().catch(() => {}) :
+        new Promise<void>((resolve) => {
+          const t = window.setTimeout(resolve, 8000);
+          image.addEventListener("load", () => { window.clearTimeout(t); resolve(); }, { once: true });
+          image.addEventListener("error", () => { window.clearTimeout(t); resolve(); }, { once: true });
+        })
+      ));
+    });
+    await page.waitForTimeout(300);
+
+  // 모든 텍스트 요소 측정 — 컨테이너(h1/h2/button 등) 도 포함해 `<br>`/span 자식 구조도 잡는다.
   const domTexts = await page.evaluate(() => {
-    const out: Array<{ text: string; x: number; y: number; w: number; h: number; color: string; font: string; size: number; weight: number; lh: number | null; ls: number | null }> = [];
-    for (const el of document.querySelectorAll("span, h1, h2, h3, h4, h5, h6, p, a, button, li, div")) {
-      if (el.children.length > 0) continue; // leaf 텍스트 요소만 (부모 색상 상속 오염 방지)
+    const out: Array<{ text: string; norm: string; leaf: boolean; x: number; y: number; w: number; h: number; color: string; font: string; size: number; weight: number; lh: number | null; ls: number | null }> = [];
+    const seen = new Set<string>();
+    for (const el of document.querySelectorAll("h1, h2, h3, h4, h5, h6, p, a, button, li, span, div")) {
+      // leaf 텍스트 요소 + 컨테이너 둘 다 후보. 단, 동일 (tag+x+y) 중복은 건너밨다.
       const t = (el.textContent ?? "").replace(/\s+/g, " ").trim();
       if (!t) continue;
-      const cs = getComputedStyle(el);
+      if (t.length > 200) continue; // 내부에 너무 긴 집합 텍스트(레이아/그리드)는 단일 노드 매칭 대상에서 제외
       const r = el.getBoundingClientRect();
       if (r.width === 0 || r.height === 0) continue;
+      const cs = getComputedStyle(el);
+      // 색은 실제 보이는 자식 요소에서 가져오는 게 정확하지만, 컨테이너도 폰트 속성은 유효.
       const lh = parseFloat(cs.lineHeight);
       const ls = parseFloat(cs.letterSpacing);
+      const key = `${el.tagName}|${Math.round(r.x)}|${Math.round(r.y)}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const norm = t.replace(/\s+/g, "").toLowerCase();
       out.push({
         text: t,
+        norm,
+        leaf: el.children.length === 0,
         x: r.x, y: r.y, w: r.width, h: r.height,
         color: cs.color,
-        font: cs.fontFamily.split(",")[0].replace(/["']/g, "").trim(),
+        font: cs.fontFamily.split(",")[0].replace(/["'“”]/g, "").trim(),
         size: parseFloat(cs.fontSize),
         weight: parseInt(cs.fontWeight, 10),
         lh: Number.isFinite(lh) ? lh : null,
         ls: Number.isFinite(ls) ? ls : null,
       });
+      // 겹침(overlap) 검사용은 아래 별도 rects 수집에서 처리
     }
     return out;
   });
+  const rects = await page.evaluate(() => {
+    const out: Array<{ t: string; x: number; y: number; w: number; h: number }> = [];
+    for (const el of document.querySelectorAll("h1, h2, h3, h4, h5, h6, p, a, button, li, span")) {
+      if (el.children.length > 0) continue;
+      const t = (el.textContent ?? " ".trim());
+      const r = el.getBoundingClientRect();
+      if (r.width > 2 && r.height > 2 && t.length >= 2) out.push({ t: t.slice(0, 24), x: r.x, y: r.y, w: r.width, h: r.height });
+    }
+    return out;
+  });
+
+  // --- 겹침(overlap) 검사: 텍스트 요소가 서로 심하게 겹치면 렌더링 결함 (critical)
+  const overlapIssues: Array<{ a: string; b: string; ratio: number }> = [];
+  for (let i = 0; i < rects.length; i++) {
+    for (let j = i + 1; j < rects.length; j++) {
+      const A = rects[i], B = rects[j];
+      const ix = Math.max(0, Math.min(A.x + A.w, B.x + B.w) - Math.max(A.x, B.x));
+      const iy = Math.max(0, Math.min(A.y + A.h, B.y + B.h) - Math.max(A.y, B.y));
+      const inter = ix * iy;
+      if (inter <= 0) continue;
+      const smaller = Math.min(A.w * A.h, B.w * B.h);
+      if (inter / smaller > 0.3 && A.t !== B.t) {
+        overlapIssues.push({ a: A.t, b: B.t, ratio: inter / smaller });
+      }
+    }
+  }
 
   // --- 매칭: Figma TEXT → DOM 요소 (정규화된 텍스트로, 동일 텍스트 다수면 위치 근접 우선)
   const used = new Set<number>();
   const results: Array<{ node: TextNode; el: (typeof domTexts)[number] | null; checks: Array<{ prop: string; exp: string; act: string; pass: boolean }> }> = [];
 
   for (const tn of texts) {
-    const norm = tn.characters.replace(/\s+/g, " ").trim();
+    const norm = tn.characters.replace(/\s+/g, "").trim().toLowerCase();
     const expected = rel(tn.bbox, tn.origin);
     const candidates = domTexts
       .map((el, i) => ({ el, i, dist: Math.hypot(el.x + el.w / 2 - (expected.x + expected.w / 2), el.y + el.h / 2 - (expected.y + expected.h / 2)) }))
-      .filter((c) => !used.has(c.i) && c.el.text === norm)
-      .sort((a, b) => a.dist - b.dist);
-    const match = candidates[0];
+      .filter((c) => !used.has(c.i) && c.el.norm === norm)
+      // 리프(실제 텍스트만 가진 요소)를 우선, 같은 텍스트면 더 작은 요소(더 정밀) 선호
+      .sort((a, b) => (Number(b.el.leaf) - Number(a.el.leaf)) || (a.el.w + a.el.h - (b.el.w + b.el.h)) || (a.dist - b.dist));
+    const exact = candidates.find((c) => c.el.leaf) ?? candidates.find((c) => !c.el.leaf);
+    let match = exact;
+    if (!match && norm.length >= 4) {
+      // 정확 일치가 없으면 포함 관계(부분 일치)로 후보를 넓힘 — 단 위치가 근접해야 함.
+      const partial = domTexts
+        .map((el, i) => ({ el, i, dist: Math.hypot(el.x + el.w / 2 - (expected.x + expected.w / 2), el.y + el.h / 2 - (expected.y + expected.h / 2)) }))
+        .filter((c) => !used.has(c.i) && (c.el.norm.includes(norm) || norm.includes(c.el.norm)))
+        .filter((c) => c.dist < 60 && c.el.leaf) // 부분 일치는 리프만 (컨테이너 오염 방지)
+        .sort((a, b) => a.dist - b.dist);
+      match = partial[0];
+    }
     if (!match) {
-      results.push({ node: tn, el: null, checks: [] });
+      if (tn.characters.trim().length >= 2) {
+        results.push({ node: tn, el: null, checks: [] });
+      }
       continue;
     }
     used.add(match.i);
@@ -256,9 +337,17 @@ async function main(): Promise<number> {
     }
   }
   const totalChecks = results.reduce((a, r) => a + r.checks.length, 0);
-  console.log(`\n  nodes: ${total - failed.length}/${total} passed · checks: ${totalChecks - failChecks.length}/${totalChecks} passed`);
-  // unmatched(미구현 변형)는 경고로 취급, exit code는 매칭된 노드의 체크 실패만 반영
-  return failChecks.length > 0 ? 1 : 0;
+  // 겹침 이슈는 렌더링 결함이므로 critical mismatch 로 취급
+  if (overlapIssues.length > 0) {
+    console.log(`\n  🚫 겹친(overlapping) 텍스트 요소 ${overlapIssues.length}개 발견 (렌더링 결함):`);
+    for (const o of overlapIssues.slice(0, 20)) {
+      console.log(`      "${o.a}" <-> "${o.b}" (겹침 ${(o.ratio * 100).toFixed(0)}%)`);
+    }
+    if (overlapIssues.length > 20) console.log(`      ... 외 ${overlapIssues.length - 20}개`);
+  }
+  console.log(`\n  nodes: ${total - failed.length}/${total} passed · checks: ${totalChecks - failChecks.length}/${totalChecks} passed · overlaps: ${overlapIssues.length}`);
+  // unmatched(미구현 변형)는 경고로 취급, exit code는 매칭 노드의 체크 실패와 겹침 결함을 반영
+  return (failChecks.length > 0 || overlapIssues.length > 0) ? 1 : 0;
   } finally {
     await browser.close();
   }
